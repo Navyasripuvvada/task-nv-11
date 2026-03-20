@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>display products by grid</title>
+    <style>
+        body{
+             background-color:#fff1f5;
+             font-family: 'Poppins', sans-serif;
+        }
+        .header{
+            text-align: center;
+            color: #a05067;
+
+        }
+        #container{
+            display: grid;
+            grid-template-columns: repeat(5,1fr);
+            grid-template-rows:auto auto;
+            gap:20px;
+            padding: 20px;
+            box-sizing: border-box;
+           
+        }
+        #container>div{
+            border:1px solid #f3c6d3;
+            text-align: center;
+            background-color:white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        #container>div>h1{
+           color: #f3c6d3;
+           font-weight: lighter;
+           font-size: 16px;
+        }
+        #container>div>h2{
+             color: #ab415f;
+             font-size: 18px;
+
+        }
+        #container>div>h3{
+             color: #965d6d;
+             font-weight: lighter;
+             font-size: 16px;
+             
+        }
+        #container > div:hover {
+           
+            transform: scale(1.05);
+        }
+        .innercontainer>h4{
+            color: #16a34a;
+        }
+        .innercontainer{
+            border: none;
+            display: flex;
+            align-items:center;
+            justify-content:space-between;
+
+        }
+        .btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            height: 30px;
+            width:60px;
+            border-radius: 5px;
+            
+        }
+        .btn:hover {
+            background-color: #dc2626;
+        }
+        .buttons{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            margin: 20px;
+        }
+        #prev,#next{
+            border: none;
+            background:none;
+            color: #ef4444 ;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Products</h1>
+    </div>
+    <div id="container">
+       
+    </div>
+    <div class="buttons">
+        <button type="button" id="prev">Prev</button>
+        <button type="button" id="next">Next</button>
+    </div>
+    <script>
+        let products=[]
+        let skip=0;
+        limit=15
+        function display(){
+             fetch(`https://dummyjson.com/products?limit=${limit}&skip=${skip}`)
+            .then(response=>response.json())
+            .then(data=>{
+                console.log(data);
+                let container=document.getElementById("container")
+                container.innerHTML="";
+                data.products.forEach(product => {
+                let div=document.createElement("div")
+                div.innerHTML=`  <h1>Id:${product.id}</h1>
+                                 <h2>${product.title}</h2>
+                                 <h3>${product.description}</h3>
+                                 <div class="innercontainer">
+                                    <h4>Price:${product.price}$</h4><br>
+                                    <button type="button" class="btn" id="${product.id}">Delete</button>
+                                 </div>`;
+                container.appendChild(div);
+                console.log("child appended successfully")
+                });
+            
+        let btns=document.querySelectorAll(".btn")
+        btns.forEach(btn => {
+             btn.addEventListener("click",function(){
+                let id=this.id;
+                fetch(`https://dummyjson.com/products/${id}`,{method:"DELETE"})
+                .then(response=>response.json())
+                .then(()=>{
+                    this.parentElement.parentElement.remove();
+                })
+            })
+        });
+     });
+    }
+    display()
+    document.getElementById("next").addEventListener("click",()=>{
+        skip+=limit;
+        display()
+    })
+    document.getElementById("prev").addEventListener("click",()=>{
+        if(skip>=limit){
+            skip-=limit;
+            display()
+        }
+    })
+
+    </script>
+</body>
+</html>
